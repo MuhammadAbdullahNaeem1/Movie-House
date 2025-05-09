@@ -6,15 +6,18 @@ export default async function handler(req, res) {
 
   switch (method) {
     case 'GET':
-      try {
-        const directors = await db.collection('directors').find({}).toArray();
-        res.status(200).json(directors || []);
-      } catch (error) {
-        res.status(500).json({ error: 'Failed to fetch directors' });
+      if (req.query.id) {
+        // Get movie details by ID
+        const movie = await db.collection('movies').findOne({ _id: req.query.id });
+        res.status(200).json(movie);
+      } else {
+        // Get all movies
+        const movies = await db.collection('movies').find({}).toArray();
+        res.status(200).json(movies);
       }
       break;
     default:
       res.setHeader('Allow', ['GET']);
       res.status(405).end(`Method ${method} Not Allowed`);
   }
-}
+} 
